@@ -17,8 +17,9 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         var hello = hello()
-        Sample().checkMe()
+        var sample:String = Sample().checkMe().toString()
         setContentView(R.layout.activity_main)
         findViewById<TextView>(R.id.text).text = hello
+        findViewById<TextView>(R.id.text2).text = sample
     }
 }
