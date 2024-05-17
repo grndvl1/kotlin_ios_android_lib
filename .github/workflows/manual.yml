@@ -1,0 +1,69 @@
+# This is a basic workflow that is manually triggered
+name: QE - Create Release Branch
+
+# Controls when the action will run. Workflow runs when manually triggered using the UI
+# or API.
+on:
+    workflow_dispatch:
+        # Inputs the workflow accepts.
+        inputs:
+            version:
+                # Friendly description to be shown in the UI instead of 'name'
+                description: 'Version Number e.g - 9.30.0'
+                # Default value if no value is explicitly provided
+                default: ''
+                # Input has to be provided for the workflow to run
+                required: true
+                # The data type of the input
+                type: string
+
+            nextVersion:
+                # Friendly description to be shown in the UI instead of 'name'
+                description: 'Next Version Number'
+                # Default value if no value is explicitly provided
+                default: ''
+                # Input has to be provided for the workflow to run
+                required: true
+                # The data type of the input
+                type: string
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+    # This workflow contains a single job called "greet"
+    create-release-and-version-branch:
+        # The type of runner that the job will run on
+        runs-on: ubuntu-latest
+
+        # Steps represent a sequence of tasks that will be executed as part of the job
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            # Runs a single command using the runners shell
+            - name: Check out and cut new branch
+              run: |
+                  echo "Starting branch cut for release ${{ inputs.version }}"
+                  version_name=${{ inputs.version }}
+                  echo "Release version name: $version_name"
+                  
+                  # create release branch and push
+                  git checkout -b release/${{ inputs.version }} main
+                  git push origin release/${{ inputs.version }}
+                  
+            - name: Increase version code and change version name
+              run: |
+                  # Update build.gradle with new version code and name
+                  echo "Update marketing version with version=${{ inputs.nextVersion }}"
+                  
+                  # create branch to update main with incremented versionName and versionCode
+                  git checkout -b version${{ inputs.nextVersion }} main
+                  
+                  # update project.pbxproj and commit changes
+                  sed -i "s/versionCode = [0-9]\+/versionCode = ${{ env.VERSION_CODE }}/g" app/build.gradle.kts
+                  sed -i "s/MARKETING_VERSION = ${{ inputs.version }};/MARKETING_VERSION = ${{ inputs.nextVersion }};/g" Cars.xcodeproj/project.pbxproj
+                  
+                  # push versionName and versionCode changes to branch for eventual PR merge to main
+                  git config user.email "github-actions@github.com"
+                  git config user.name "Github Actions"
+                  git commit -am "Bump version code and change version name"
+                  git push origin HEAD
