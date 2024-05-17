@@ -59,8 +59,7 @@ jobs:
                   git checkout -b version${{ inputs.nextVersion }} main
                   
                   # update project.pbxproj and commit changes
-                  sed -i "s/versionCode = [0-9]\+/versionCode = ${{ env.VERSION_CODE }}/g" app/build.gradle.kts
-                  sed -i "s/MARKETING_VERSION = ${{ inputs.version }};/MARKETING_VERSION = ${{ inputs.nextVersion }};/g" Cars.xcodeproj/project.pbxproj
+                  sed -i "s/MARKETING_VERSION = ${{ inputs.version }};/MARKETING_VERSION = ${{ inputs.nextVersion }};/g" iosApp/iosApp.xcodeproj/project.pbxproj
                   
                   # push versionName and versionCode changes to branch for eventual PR merge to main
                   git config user.email "github-actions@github.com"
