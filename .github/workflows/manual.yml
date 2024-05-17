@@ -47,7 +47,7 @@ jobs:
                   echo "Release version name: $version_name"
                   
                   # create release branch and push
-                  git checkout -b release/${{ inputs.version }} main
+                  git checkout -b release/${{ inputs.version }} master
                   git push origin release/${{ inputs.version }}
                   
             - name: Increase version code and change version name
@@ -56,7 +56,7 @@ jobs:
                   echo "Update marketing version with version=${{ inputs.nextVersion }}"
                   
                   # create branch to update main with incremented versionName and versionCode
-                  git checkout -b version${{ inputs.nextVersion }} main
+                  git checkout -b version${{ inputs.nextVersion }} master
                   
                   # update project.pbxproj and commit changes
                   sed -i "s/MARKETING_VERSION = ${{ inputs.version }};/MARKETING_VERSION = ${{ inputs.nextVersion }};/g" iosApp/iosApp.xcodeproj/project.pbxproj
